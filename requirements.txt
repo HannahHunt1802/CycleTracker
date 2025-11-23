@@ -2,5 +2,7 @@ flask
 flask_sqlalchemy
 flask_limiter
 flask_wtf
+flask_login
+sqlalchemy
 werkzeug
 datetime
