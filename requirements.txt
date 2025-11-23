@@ -4,6 +4,7 @@ flask_limiter
 flask_wtf
 flask_login
 flask_bcrypt
+wtforms
 sqlalchemy
 werkzeug
 datetime
