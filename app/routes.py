@@ -79,6 +79,8 @@ def login():
                 current_app.logger.warning(f'Failed login attempt. IP: {hash_for_log(user_ip)}.')
         except Exception:
             db.session.rollback()
+            current_app.logger.error(f"Login failed: {traceback.format_exc()}, IP: {hash_for_log(user_ip)}")
+            flash("An unexpected error occurred. Please try again.", "error")
     return render_template('login.html', form=form)
 
 @main.route('/dashboard')
