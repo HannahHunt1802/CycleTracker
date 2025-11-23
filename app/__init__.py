@@ -43,5 +43,24 @@ def create_app():
     app.logger.addHandler(handler)
     app.logger.setLevel(logging.INFO)
 
+    with app.app_context():
+        from .models import User
+        db.create_all()
+        if not User.query.first():
+            sample_users = [
+                {"name": "Alice", "email": "alice@example.com", "password": "Password123!"},
+                {"name": "Bob", "email": "bob@example.com", "password": "SecurePass1@"},
+                {"name": "Charlie", "email": "charlie@example.com", "password": "MyPass!2025"}
+            ]
+            for u in sample_users:
+                #check if user already exists
+                if not User.query.filter_by(name=u["name"]).first():
+                    user = User()
+                    user.name = u["name"]
+                    user.email = u["email"]
+                    user.set_password(u["password"])
+                    db.session.add(user)
+            db.session.commit()
+            app.logger.info("Database initialized with default users.")
     return app
 
