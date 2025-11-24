@@ -14,9 +14,10 @@ def hash_for_log(value):
 
 @main.route('/')
 def base():
+    form=LoginForm()
     if 'user_id' in session:
-        return render_template('main.dashboard', )
-    return render_template('main.login')
+        return render_template('dashboard.html', )
+    return render_template('login.html', form=form)
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
