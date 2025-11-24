@@ -1,6 +1,7 @@
 import hashlib
 import traceback
-from flask import request, render_template, redirect, url_for, session, Blueprint, flash, abort, current_app
+from flask import request, render_template, redirect, url_for, session, Blueprint, flash, current_app
+from functools import wraps
 from app import db, limiter, bcrypt
 from app.forms import RegisterForm, LoginForm
 from app.models import User
@@ -13,8 +14,9 @@ def hash_for_log(value):
 
 @main.route('/')
 def base():
-    form = LoginForm()
-    return render_template('login.html', form=form)
+    if 'user_id' in session:
+        return render_template('main.dashboard', )
+    return render_template('main.login')
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -57,6 +59,16 @@ def register():
                                                f"Error: {error}, IP: {hash_for_log(user_ip)}.")
     return render_template('register.html', form=form)
 
+#method to protect the dashboard, ensures user must log in before being granted access
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please login first.', 'error')
+            return redirect(url_for('main.login'))
+        return f(*args, **kwargs)
+    return wrap
+
 @main.route('/login', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")
 def login():
@@ -86,4 +98,5 @@ def login():
 
 @main.route('/dashboard')
 def dashboard():
-    return "DASHBOARD"
+    user = User.query.get(session['user_id'])
+    return render_template('dashboard.html', user=user)
