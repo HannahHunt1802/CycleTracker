@@ -14,22 +14,6 @@ main = Blueprint('main', __name__)
 def hash_for_log(value):
     return hashlib.sha256(str(value).encode()).hexdigest()
 
-@main.route('/')
-def base():
-    login_form = LoginForm()
-    logout_form=LogoutForm()
-    update_profile_form = UpdateProfileForm()
-    change_password_form = ChangePasswordForm()
-
-    user_id = session.get('user_id')
-    user = User.query.get(user_id) if user_id else None
-    cycle_pred = calculate_cycle_predictions(user)
-
-    if 'user_id' in session:
-        return render_template('dashboard.html', user=user, logout_form=logout_form, update_profile_form=update_profile_form,
-                               change_password_form=change_password_form, cycle_pred=cycle_pred)
-    return render_template('login.html', login_form=login_form)
-
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     register_form = RegisterForm()
@@ -118,16 +102,31 @@ def logout():
     flash('You have been logged out successfully.', 'success')
     return redirect(url_for('main.login'))
 
+
+#helper methods for rendering dashboard template
+def get_current_user():
+    user_id = session.get('user_id')
+    return db.session.get(User, user_id) if user_id else None
+
+def dashboard_context():
+    user = get_current_user()
+
+    return {
+        "user": user,
+        "logout_form": LogoutForm(),
+        "update_profile_form": UpdateProfileForm(),
+        "change_password_form": ChangePasswordForm(),
+        "cycle_pred": calculate_cycle_predictions(user)
+    }
+
+@main.route('/')
+def base():
+    return redirect(url_for('main.dashboard'))
+
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    logout_form = LogoutForm()
-    user_id = session.get('user_id')
-
-    user = User.query.get(user_id) if user_id else None
-    cycle_pred = calculate_cycle_predictions(user)
-
-    return render_template('dashboard.html', user=user, logout_form=logout_form, cycle_pred=cycle_pred)
+    return render_template('dashboard.html', **dashboard_context())
 
 #MY ACCOUNT TAB
 @main.route('/update_profile', methods=['POST'])
@@ -135,8 +134,7 @@ def dashboard():
 def update_profile():
     update_profile_form = UpdateProfileForm()
     user_ip = request.remote_addr or "Unknown IP"
-    user_id = session.get('user_id')
-    user = User.query.get(user_id) if user_id else None
+    user = get_current_user()
 
     if update_profile_form.validate_on_submit():
         try:
@@ -149,7 +147,7 @@ def update_profile():
 
             flash("Profile updated successfully.", "success")
             current_app.logger.info(
-                f"Profile updated. User ID: {hash_for_log(user_id)}, "
+                f"Profile updated. User ID: {hash_for_log(user.id)}, "
                 f"Old Name: {hash_for_log(old_name)}, New Name: {hash_for_log(user.name)}, "
                 f"Old Email: {hash_for_log(old_email)}, New Email: {hash_for_log(user.email)}, "
                 f"IP: {hash_for_log(user_ip)}"
@@ -159,7 +157,7 @@ def update_profile():
             db.session.rollback()
             flash("An unexpected error occurred while updating your profile.", "error")
             current_app.logger.error(
-                f"Failed to update profile. User ID: {hash_for_log(user_id)}, IP: {hash_for_log(user_ip)}",
+                f"Failed to update profile. User ID: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}",
                 exc_info=True
             )
     else:
@@ -168,24 +166,23 @@ def update_profile():
                 flash(f"{field}: {error}", "error")
                 current_app.logger.warning(
                     f"Update profile validation failed. Field: {field}, Error: {error}, "
-                    f"User ID: {hash_for_log(user_id)}, IP: {hash_for_log(user_ip)}"
+                    f"User ID: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}"
                 )
-
-    return redirect(url_for('main.dashboard'))
+    return render_template('dashboard.html', **dashboard_context())
 
 
 @main.route('/change_password', methods=['POST'])
 @login_required
 def change_password():
     change_password_form = ChangePasswordForm()
+
     user_ip = request.remote_addr or "Unknown IP"
-    user_id = session.get('user_id')
-    user = db.session.get(User, user_id)
+    user = get_current_user()
 
     if not user:
         current_app.logger.warning(
             f"Unauthorized password change attempt. Invalid user_id in session. "
-            f"user_id={hash_for_log(user_id)}, IP={hash_for_log(user_ip)}"
+            f"user_id={hash_for_log(user.id)}, IP={hash_for_log(user_ip)}"
         )
         abort(403, description="Access denied.")
 
@@ -193,30 +190,17 @@ def change_password():
         try:
             if not user.check_password(change_password_form.current_password.data):
                 flash('Current password is incorrect.', 'error')
-                current_app.logger.warning(
-                    f"Password change failed. Incorrect current password. User: {hash_for_log(user.name)}, "
-                    f"user_id={hash_for_log(user.id)}, IP={hash_for_log(user_ip)}"
-                )
-                return render_template('change_password.html', change_password_form=change_password_form)
-
-                # Check new password is different
-            if user.check_password(change_password_form.new_password.data):
+            elif user.check_password(change_password_form.new_password.data):
                 flash('New password must be different from the current password.', 'error')
-                current_app.logger.warning(
-                    f"Password change failed. New password same as current. User: {hash_for_log(user.name)}, "
+            else:
+                user.set_password(change_password_form.new_password.data)
+                db.session.commit()
+                flash('Password changed successfully.', 'success')
+                current_app.logger.info(
+                    f"Password changed successfully. User: {hash_for_log(user.name)}, "
                     f"user_id={hash_for_log(user.id)}, IP={hash_for_log(user_ip)}"
                 )
-                return render_template('change_password.html', change_password_form=change_password_form)
-
-            # Update password
-            user.set_password(change_password_form.new_password.data)
-            db.session.commit()
-            flash('Password changed successfully.', 'success')
-            current_app.logger.info(
-                f"Password changed successfully. User: {hash_for_log(user.name)}, "
-                f"user_id={hash_for_log(user.id)}, IP={hash_for_log(user_ip)}"
-            )
-            return redirect(url_for('main.dashboard'))
+                return redirect(url_for('main.dashboard'))
 
         except Exception:
             db.session.rollback()
@@ -237,4 +221,4 @@ def change_password():
                     f"User: {hash_for_log(user.name)}, user_id={hash_for_log(user.id)}, IP={hash_for_log(user_ip)}"
                 )
 
-    return render_template('change_password.html', change_password_form=change_password_form)
+    return render_template('dashboard.html', **dashboard_context())
