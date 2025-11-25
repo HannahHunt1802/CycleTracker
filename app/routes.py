@@ -2,9 +2,11 @@ import hashlib
 import traceback
 from flask import request, render_template, redirect, url_for, session, Blueprint, flash, current_app
 from functools import wraps
+
 from app import db, limiter, bcrypt
 from app.forms import RegisterForm, LoginForm, LogoutForm
 from app.models import User
+from app.cycle_calc import calculate_cycle_predictions
 
 main = Blueprint('main', __name__)
 
@@ -19,9 +21,10 @@ def base():
 
     user_id = session.get('user_id')
     user = User.query.get(user_id) if user_id else None
+    cycle_pred = calculate_cycle_predictions(user)
 
     if 'user_id' in session:
-        return render_template('dashboard.html', user=user, form=logout_form)
+        return render_template('dashboard.html', user=user, form=logout_form, cycle_pred=cycle_pred)
     return render_template('login.html', form=login_form)
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -117,5 +120,8 @@ def logout():
 def dashboard():
     logout_form = LogoutForm()
     user_id = session.get('user_id')
+
     user = User.query.get(user_id) if user_id else None
-    return render_template('dashboard.html', user=user, form=logout_form)
+    cycle_pred = calculate_cycle_predictions(user)
+
+    return render_template('dashboard.html', user=user, form=logout_form, cycle_pred=cycle_pred)

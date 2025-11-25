@@ -29,8 +29,8 @@
 
             <!--next event container-->
             <div class="today-container">
-                <h2 id="period" class="today">period data</h2>
-                <h2 id="ovulation" class="today">ovulation data</h2>
+                <h2 id="period" class="today">{{ cycle_pred.period_text}}</h2>
+                <h2 id="ovulation" class="today">{{ cycle_pred.ovulation_text}}</h2>
                 <div class="sun-moon-container">
                     <div class="sun">
                         <img src="{{ url_for('static', filename='assets/Centre.png') }}" alt="Sun Center" class="sun-center">
