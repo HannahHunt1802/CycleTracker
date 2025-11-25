@@ -30,14 +30,14 @@ def base():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm()
+    register_form = RegisterForm()
     user_ip = request.remote_addr or "Unknown IP" #must be INSIDE route
 
-    if form.validate_on_submit():
+    if register_form.validate_on_submit():
         try:
-            name = form.name.data.strip()
-            email= form.email.data.strip()
-            password = form.password.data.strip()
+            name = register_form.name.data.strip()
+            email= register_form.email.data.strip()
+            password = register_form.password.data.strip()
 
             new_user = User()
             new_user.name = name
@@ -61,13 +61,13 @@ def register():
             flash("An unexpected error has occurred, please try again.", "error")
 
     else:
-        if form.errors:
-            for field, errors in form.errors.items():
+        if register_form.errors:
+            for field, errors in register_form.errors.items():
                 for error in errors:
                     flash(f"{field}: {error}", 'error')
                     current_app.logger.warning(f"Registration validation failed. Field: {field}, "
                                                f"Error: {error}, IP: {hash_for_log(user_ip)}.")
-    return render_template('register.html', form=form)
+    return render_template('register.html', register_form=register_form)
 
 #method to protect the dashboard, ensures user must log in before being granted access
 def login_required(f):
@@ -82,13 +82,13 @@ def login_required(f):
 @main.route('/login', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")
 def login():
-    form = LoginForm()
+    login_form = LoginForm()
     user_ip = request.remote_addr or "Unknown IP"
-    if form.validate_on_submit():
+    if login_form.validate_on_submit():
         try:
-            user = User.query.filter_by(email=form.email.data).first()
+            user = User.query.filter_by(email=login_form.email.data).first()
 
-            if user and bcrypt.check_password_hash(user.password, form.password.data):
+            if user and bcrypt.check_password_hash(user.password, login_form.password.data):
                 session.clear()
                 session.permanent=True
                 session['user_id'] = user.id
@@ -104,7 +104,7 @@ def login():
             db.session.rollback()
             current_app.logger.error(f"Login failed: {traceback.format_exc()}, IP: {hash_for_log(user_ip)}")
             flash("An unexpected error occurred. Please try again.", "error")
-    return render_template('login.html', form=form)
+    return render_template('login.html', login_form=login_form)
 
 @main.route('/logout', methods=['POST'])
 @login_required
@@ -125,24 +125,24 @@ def dashboard():
     user = User.query.get(user_id) if user_id else None
     cycle_pred = calculate_cycle_predictions(user)
 
-    return render_template('dashboard.html', user=user, form=logout_form, cycle_pred=cycle_pred)
+    return render_template('dashboard.html', user=user, logout_form=logout_form, cycle_pred=cycle_pred)
 
 #MY ACCOUNT TAB
 @main.route('/update_profile', methods=['POST'])
 @login_required
 def update_profile():
-    form = UpdateProfileForm()
+    update_profile_form = UpdateProfileForm()
     user_ip = request.remote_addr or "Unknown IP"
     user_id = session.get('user_id')
     user = User.query.get(user_id) if user_id else None
 
-    if form.validate_on_submit():
+    if update_profile_form.validate_on_submit():
         try:
             old_name = user.name
             old_email = user.email
 
-            user.name = form.name.data.strip()
-            user.email = form.email.data.strip()
+            user.name = update_profile_form.name.data.strip()
+            user.email = update_profile_form.email.data.strip()
             db.session.commit()
 
             flash("Profile updated successfully.", "success")
@@ -161,7 +161,7 @@ def update_profile():
                 exc_info=True
             )
     else:
-        for field, errors in form.errors.items():
+        for field, errors in update_profile_form.errors.items():
             for error in errors:
                 flash(f"{field}: {error}", "error")
                 current_app.logger.warning(
