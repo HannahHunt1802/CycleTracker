@@ -5,8 +5,8 @@ from .models import User
 import re
 
 class RegisterForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(max=30)])
-    email = StringField('Email', validators=[DataRequired(), Email(message="Invalid email address."), Length(max=254)])
+    name = StringField('Name', validators=[DataRequired(), Length(max=15)])
+    email = StringField('Email', validators=[DataRequired(), Email(message="Invalid email address."), Length(max=120)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=30), Regexp(r'^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])', message="Password must contain at least one uppercase, digit and special character.")])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo("password", message="Passwords must match.")])
     submit = SubmitField('Register')
