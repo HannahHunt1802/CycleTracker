@@ -1,3 +1,18 @@
+/*USING TEMPLATE FROM MY PLANT-APP REPO*/
+/* ================================
+    General Styles
+====================================*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* applying the same font globally */
+body {
+    font-family: 'Quicksand', sans-serif;
+}
+
 /* ================================
    1. Dashboard
 ====================================*/
@@ -10,14 +25,14 @@
     position: relative;
 }
 .dashboard-background h1{
-    color:#1E692A;
+    color:#AC536F;
     font-weight:bold;
     font-size:100px;
     padding:20px;
 }
 .dashboard-background .log-period-btn{
     background-color: #D7CAB8;
-    color: #8C7656;
+    color: #C0AE95;
     font-size: 40px;
     border: none;
     display:flex;
@@ -34,7 +49,7 @@
     position:absolute;
     top:15%;
     height:60px;
-    width: 62%;;
+    width: 62%;
     background-color:#D2C2AB;
     padding-top: 20px;
     padding-inline:25px;
@@ -45,8 +60,8 @@
 /* for each individual tab */
 .tab {
     padding: 15px 25px;
-    background-color: #53785A;
-    color: #d8d4ce;
+    background-color: #AC536F;
+    color: #D2C2AB;
     border-left:2px solid #D2C2AB;
     border-top:2px solid #D2C2AB;
     text-decoration: none;
@@ -75,7 +90,7 @@
 }
 /* when hovering over the tab */
 .tab:hover {
-    background-color:#1E692A;
+    background-color:#CE6D8C;
     height:50px;
     width:180px;
     box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
@@ -85,8 +100,8 @@
 }
 /* selected tab appears in front */
 .tab.active {
-    background-color: #1E692A;
-    color: white;
+    background-color: #CE6D8C;
+    color: #D2C2AB;
     height:60px;
     width:180px;
     box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
@@ -94,51 +109,12 @@
     margin-top: -20px;
     cursor:pointer;
 }
-
-/*editing new tab button style*/
-.tab-container .new-tab-button {
-    padding: 15px 25px;
-    background-color: #1E692A;
-    color: #d8d4ce;
-    border:none;
-    border-left:2px solid #D2C2AB;
-    border-top:2px solid #D2C2AB;
-    text-decoration: none;
-    border-radius: 10px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0.3s;
-    position: relative;
-    top:0;
-    cursor: pointer;
-    opacity: 50%;
-    height:40px;
-    width: 40px;
-    display:flex;
-    align-items: center;
-    justify-content: center;
-    transition: height 0.3s ease, width 0.3s ease, margin-top 0.3s ease, box-shadow 0.3s ease;
-}
-.tab-container .new-tab-button:hover {
-    opacity:90%;
-    border-radius: 10px;
-    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
-    z-index: 5;
-    margin-top:-7px;
-    animation: bulge 2s ease-in-out infinite; /*adding bulging animation*/
-}
-/*creating bulging animation*/
-@keyframes bulge{
-    0%, 100% {transform: scale(1);}
-    50% {transform: scale(1.05);}
-}
-
 /* Today update section */
 .today-container{
     position:fixed;
     height:229px;
     width: 37%;
-    background-color:#9AA6BB;
+    background-color:#AA84AB;
     padding-top: 20px;
     padding-inline:25px;
     border-radius: 10px;
@@ -152,18 +128,18 @@
 /*today-container text*/
 .today-container #period{
     opacity:90%;
-    color:#354B74;
+    color:#602361; /* text brown */
     font-size: 35px;
     text-align: center;
 }
 .today-container #ovulation{
-    color:#354B74;
+    color:#602361; /* brown */
     font-size: 70px;
     text-align: center;
 }
 .today-container #sun{
     opacity:90%;
-    color:#354B74;
+    color:#602361;
     font-size: 25px;
     text-align: left;
 }
@@ -196,7 +172,7 @@
     100% {transform:translate(-50%, -50%) rotate(360deg)}
 }
 .moon{
-
+   display:none;
 }
 
 /* ================================
