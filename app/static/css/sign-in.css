@@ -13,6 +13,17 @@ body {
     font-family: 'Quicksand', sans-serif;
 }
 
+/* Chrome, Safari, Edge autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px #d8d4ce inset; /* keeps your background color */
+    -webkit-text-fill-color: #483924; /* sets text color */
+    font-family: inherit; /* keeps your font */
+    transition: background-color 5000s ease-in-out 0s; /* prevents flash */
+}
+
 /* ================================
    2. Sign In Page
 ====================================*/
@@ -23,8 +34,9 @@ body {
     justify-content:center;
     align-items:center;
 }
+/* BACKGROUND CONTAINER */
 .background {
-    background-color:#537759;
+    background-color:#AC536F;
     height:98vh;
     width:98vw;
     display:flex;
@@ -41,7 +53,7 @@ body {
     z-index:3; /* indexed in order to put Welcome title in front of login box, when window is shrunk */
 }
 
-/* login page*/
+/* LOGIN BOX*/
 .login {
     background-color:#D7CAB8;
     height:80vh;
@@ -62,58 +74,70 @@ body {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* login title*/
 .login h1 {
-    color:#53785A;
+    color:#AC536F;
     font-size: 40px;
     margin: 0;
 }
-.login h2 {
-    margin-top:20px;
-    color: #483924;
-    font-size: 15px;
+
+/*form container*/
+.form-container{
+    width:100%;
+}
+.form-container #login-form-container{
+    height:50%
 }
 
-/* User inputs */
-#form-container{
-    width:100%;
-    margin-top:50px;
-}
-#form-container form{
+.form-container form{
     display: flex;
     flex-direction: column;
     width:100%;
 }
-#form-container label{
+.form-container label{
     margin-top:10px;
     color:#483924;
     font-weight: 500;
 }
-#form-container input {
+/*input fields*/
+.form-container .form-input {
     background-color: #d8d4ce;
     border-radius: 10px;
-    border:1px solid #a99a86;
+    border: 1px solid #a99a86;
     padding: 12px;
     font-size: 16px;
+    color: #483924;
+    font-family: inherit;
+    width: 100%;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Focus and active states */
+.form-container .form-input:focus,
+.form-container .form-input:active {
+    outline: none;
+    border: 1px solid #AC536F;
+    background-color: #d8d4ce;
+    color: #483924;
+}
+
+/* Hover state */
+.form-container .form-input:hover {
+    border: 1px solid #AC536F;
 }
 
 /*sign in button*/
 .sign-in-btn {
     margin-top: 40px;
-    background: linear-gradient(135deg, #354B74, #4A6AA3);
-    color: white;
+    background: linear-gradient(135deg, #AC536F, #AA84AB);
+    color: #d7cab8;
     border: none;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     font-size: 18px;
     font-weight: 500;
     letter-spacing: 0.5px;
     transition: transform 0.2s ease, background 0.3s ease;
-}
-.sign-in-btn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #2d3f5f, #3f5f8a);
-}
-
-.sign-in-btn{
     display:flex;
     align-items: center;
     justify-content: center;
@@ -122,9 +146,12 @@ body {
     border-radius: 10px;
     transition: background-color 0.3s ease;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: lighter;
 }
+.sign-in-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #2d3f5f, #3f5f8a);
+}
+
 /* Making buttons align centrally on login page*/
 .login .btn-container{
     display: flex;
@@ -135,18 +162,19 @@ body {
 /* 'register here' and 'login here' buttons */
 .link-btn {
     background-color: transparent;
-    border: 2px solid #354B74;
-    color: #354B74;
+    border: 2px solid #986D99;
+    color: #986D99;
     padding: 12px 24px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin-left: 10px;
 }
 .link-btn:hover {
-    background-color: #354B74;
-    color: white;
+    background-color: #986D99;
+    color: #d7cab8;
 }
 /* pushing the links further down */
 .link-container {
