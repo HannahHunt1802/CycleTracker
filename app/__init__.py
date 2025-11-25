@@ -44,7 +44,7 @@ def create_app():
     app.logger.setLevel(logging.INFO)
 
     with app.app_context():
-        from .models import User
+        from .models import User, CycleSettings, PeriodLog
         db.create_all()
         if not User.query.first():
             sample_users = [
