@@ -42,3 +42,7 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(message="Invalid email address.")])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class LogoutForm(FlaskForm):
+    #empty to provide csrf token for logout button
+    submit = SubmitField('Logout')

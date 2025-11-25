@@ -99,6 +99,16 @@ def login():
             flash("An unexpected error occurred. Please try again.", "error")
     return render_template('login.html', form=form)
 
+@main.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    user_ip = request.remote_addr or "Unknown IP"
+    user_id = session.get('user_id')
+    session.clear()
+    current_app.logger.info(f"Logged out user: {hash_for_log(user_id)}, IP: {hash_for_log(user_ip)}")
+    flash('You have been logged out successfully.', 'success')
+    return redirect(url_for('main.login'))
+
 @main.route('/dashboard')
 @login_required
 def dashboard():
