@@ -53,7 +53,7 @@ class UpdateProfileForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email(), Length(max=120)])
     submit = SubmitField("Update Profile")
 
-class ChangePassword(FlaskForm):
+class ChangePasswordForm(FlaskForm):
     old_password = PasswordField("Current Password", validators=[DataRequired()])
     new_password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=30),
                                                      Regexp(r'^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])',
@@ -94,5 +94,5 @@ class UpdateCycleSettingsForm(FlaskForm):
     avg_cycle_length = IntegerField("Average Cycle Length", validators=[DataRequired(), NumberRange(min=21, max=60)]) #if number outside of range then automatically toggle cycle to irregular
     submit = SubmitField("Update Cycle Settings")
 
-class DeleteAccount(FlaskForm):
+class DeleteAccountForm(FlaskForm):
     submit = SubmitField("Delete Account")
