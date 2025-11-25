@@ -37,7 +37,7 @@ class CycleSettings(db.Model):
     updated_at = db.Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 #individual period table
-class PeriodLog(db.model):
+class PeriodLog(db.Model):
     __tablename__ = 'period_log'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
