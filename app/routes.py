@@ -4,7 +4,7 @@ from flask import request, render_template, redirect, url_for, session, Blueprin
 from functools import wraps
 
 from app import db, limiter, bcrypt
-from app.forms import RegisterForm, LoginForm, LogoutForm
+from app.forms import RegisterForm, LoginForm, LogoutForm, UpdateProfileForm, ChangePasswordForm, UpdateCycleSettingsForm, DeleteAccountForm
 from app.models import User
 from app.cycle_calc import calculate_cycle_predictions
 
@@ -18,14 +18,15 @@ def hash_for_log(value):
 def base():
     login_form = LoginForm()
     logout_form=LogoutForm()
+    update_profile_form = UpdateProfileForm()
 
     user_id = session.get('user_id')
     user = User.query.get(user_id) if user_id else None
     cycle_pred = calculate_cycle_predictions(user)
 
     if 'user_id' in session:
-        return render_template('dashboard.html', user=user, form=logout_form, cycle_pred=cycle_pred)
-    return render_template('login.html', form=login_form)
+        return render_template('dashboard.html', user=user, logout_form=logout_form, update_profile_form=update_profile_form, cycle_pred=cycle_pred)
+    return render_template('login.html', login_form=login_form)
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -125,3 +126,49 @@ def dashboard():
     cycle_pred = calculate_cycle_predictions(user)
 
     return render_template('dashboard.html', user=user, form=logout_form, cycle_pred=cycle_pred)
+
+#MY ACCOUNT TAB
+@main.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    form = UpdateProfileForm()
+    user_ip = request.remote_addr or "Unknown IP"
+    user_id = session.get('user_id')
+    user = User.query.get(user_id) if user_id else None
+
+    if form.validate_on_submit():
+        try:
+            old_name = user.name
+            old_email = user.email
+
+            user.name = form.name.data.strip()
+            user.email = form.email.data.strip()
+            db.session.commit()
+
+            flash("Profile updated successfully.", "success")
+            current_app.logger.info(
+                f"Profile updated. User ID: {hash_for_log(user_id)}, "
+                f"Old Name: {hash_for_log(old_name)}, New Name: {hash_for_log(user.name)}, "
+                f"Old Email: {hash_for_log(old_email)}, New Email: {hash_for_log(user.email)}, "
+                f"IP: {hash_for_log(user_ip)}"
+            )
+
+        except Exception:
+            db.session.rollback()
+            flash("An unexpected error occurred while updating your profile.", "error")
+            current_app.logger.error(
+                f"Failed to update profile. User ID: {hash_for_log(user_id)}, IP: {hash_for_log(user_ip)}",
+                exc_info=True
+            )
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "error")
+                current_app.logger.warning(
+                    f"Update profile validation failed. Field: {field}, Error: {error}, "
+                    f"User ID: {hash_for_log(user_id)}, IP: {hash_for_log(user_ip)}"
+                )
+
+    return redirect(url_for('main.dashboard'))
+
+

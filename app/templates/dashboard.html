@@ -16,14 +16,14 @@
 
             <!--tabs-->
             <div class="tab-container">
+                <a data-target="my-cycle-tab" class="tab">My Cycle</a>
                 <a data-target="calendar-tab" class="tab">Calendar</a>
                 <a data-target="settings-tab" class="tab">My Account</a>
-                <a data-target="my-cycle-tab" class="tab">My Cycle</a>
                 <a data-target="logout-tab" class="tab">Log Out</a>
 
                 <!--invisible logout form-->
                 <form method="POST" action="{{ url_for('main.logout') }}" style="display:none;" id="logout-form" novalidate>
-                    {{ form.hidden_tag() }}
+                    {{ logout_form.hidden_tag() }}
                 </form>
             </div>
 
@@ -46,8 +46,46 @@
             <div id="calendar-tab" class="tab-content">
                 <p>This is the calendar.</p>
             </div>
-            <div id="statistics-tab" class="tab-content">
-                <p>Here are you cycle statistics.</p>
+
+            <!-- SETTINGS TAB (MY ACCOUNT) -->
+            <div id="settings-tab" class="tab-content">
+                <div class="open-tab-container" id="setting-tab-container">
+
+                    <h3>My Account</h3>
+                    <form method="POST" action="{{ url_for('main.update_profile') }}" novalidate>
+                        {{ update_profile_form.hidden_tag() }}
+
+                        <div class="update_profile_form-group">
+                            <label for="name">Name:</label>
+                            {{ update_profile_form.name(class="form-control", value=user.name) }}
+                        </div>
+
+                        <div class="update_profile_form-group">
+                            <label for="email">Email:</label>
+                            {{ update_profile_form.email(class="form-control", value=user.email) }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                    <hr>
+
+                    <h3>Change Password</h3>
+                    <!--Old Password
+                    New Password
+                    Confirm new password
+                    Submit-->
+
+                    <h3>Cycle Settings</h3>
+                    <!--Regular Cycle toggle
+                    Average Period Length: updates if cycle length is changed
+                    Average Cycle Length: updates if period length is changed-->
+
+                    <h3>Danger Zone</h3>
+                    <!--Delete account
+                    Are you sure you want to delete this account?
+                    Account deleted --- > logout. -->
+
+                </div>
             </div>
         </div>
     </div>
