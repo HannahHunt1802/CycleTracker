@@ -96,17 +96,35 @@
 
                     <div class="open-tab-inner">
                         <h3>Cycle Settings</h3>
-                        <!--Regular Cycle toggle
-                        Average Period Length: updates if cycle length is changed
-                        Average Cycle Length: updates if period length is changed-->
+                        <form method="POST" action="{{ url_for('main.update_cycle_settings') }}">
+                            {{ update_cycle_settings_form.hidden_tag() }}
+
+                            <div class="form-group">
+                                <label for="avg_period_length">Average Period Length (days):</label>
+                                {{ update_cycle_settings_form.avg_period_length(class="form-control", value=user.avg_period_length) }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="avg_cycle_length">Average Cycle Length (days):</label>
+                                {{ update_cycle_settings_form.avg_cycle_length(class="form-control", value=user.avg_cycle_length) }}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Update Cycle Settings</button>
+                        </form>
                     </div>
                     <hr>
 
                     <div class="open-tab-inner">
                         <h3>Danger Zone</h3>
-                        <!--Delete account
-                        Are you sure you want to delete this account?
-                        Account deleted --- > logout. -->
+                        <form method="POST" action="{{ url_for('main.delete_account') }}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+                            {{ delete_account_form.hidden_tag() }}
+
+                            <p class="danger-zone-warning">
+                                Deleting your account is irreversible. All your data will be lost.
+                            </p>
+
+                            <button type="submit" class="btn btn-danger">Delete Account</button>
+                        </form>
                     </div>
                     <hr>
 

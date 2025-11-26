@@ -116,6 +116,8 @@ def dashboard_context():
         "logout_form": LogoutForm(),
         "update_profile_form": UpdateProfileForm(),
         "change_password_form": ChangePasswordForm(),
+        "update_cycle_settings_form": UpdateCycleSettingsForm(),
+        "delete_account_form": DeleteAccountForm(),
         "cycle_pred": calculate_cycle_predictions(user)
     }
 
@@ -222,3 +224,78 @@ def change_password():
                 )
 
     return render_template('dashboard.html', **dashboard_context())
+
+@main.route('/update_cycle_settings', methods=['POST'])
+@login_required
+def update_cycle_settings():
+    form = UpdateCycleSettingsForm()
+    user = get_current_user()
+    user_ip = request.remote_addr or "Unknown IP"
+
+    if form.validate_on_submit():
+        try:
+            user.avg_period_length = form.avg_period_length.data
+            user.avg_cycle_length = form.avg_cycle_length.data
+            db.session.commit()
+            flash("Cycle settings updated successfully.", "success")
+            current_app.logger.info(
+                f"Cycle settings updated. User: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}"
+            )
+        except Exception:
+            db.session.rollback()
+            flash("An unexpected error occurred while updating cycle settings.", "error")
+            current_app.logger.error(
+                f"Failed to update cycle settings. User: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}",
+                exc_info=True
+            )
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "error")
+                current_app.logger.warning(
+                    f"Update cycle settings validation failed. Field: {field}, Error: {error}, "
+                    f"User: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}"
+                )
+
+    return render_template('dashboard.html', **dashboard_context())
+
+@main.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user = get_current_user()
+    user_ip = request.remote_addr or "Unknown IP"
+
+    if not user:
+        current_app.logger.warning(
+            f"Unauthorized delete account attempt. Invalid user_id in session. IP: {hash_for_log(user_ip)}"
+        )
+        abort(403, description="Access denied.")
+
+    form = DeleteAccountForm()
+    if form.validate_on_submit():
+        try:
+            user_id_hash = hash_for_log(user.id)
+            db.session.delete(user)
+            db.session.commit()
+            session.clear()
+            flash("Your account has been deleted successfully.", "success")
+            current_app.logger.info(
+                f"Account deleted. User: {user_id_hash}, IP: {hash_for_log(user_ip)}"
+            )
+            return redirect(url_for('main.register'))  # or login page
+        except Exception:
+            db.session.rollback()
+            flash("An unexpected error occurred while deleting your account.", "error")
+            current_app.logger.error(
+                f"Failed to delete account. User: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}",
+                exc_info=True
+            )
+
+    else:
+        flash("Form submission invalid. Please try again.", "error")
+        current_app.logger.warning(
+            f"Delete account form validation failed. User: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}"
+        )
+
+    return render_template('login.html', login_form=LoginForm())
+
