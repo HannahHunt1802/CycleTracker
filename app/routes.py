@@ -266,36 +266,26 @@ def delete_account():
     user_ip = request.remote_addr or "Unknown IP"
 
     if not user:
-        current_app.logger.warning(
-            f"Unauthorized delete account attempt. Invalid user_id in session. IP: {hash_for_log(user_ip)}"
+        flash("User not found.", "error")
+        return redirect(url_for('main.dashboard'))
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+
+        session.clear()
+        flash("Account deleted successfully.", "success")
+        current_app.logger.info(
+            f"User account deleted. User ID: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}"
         )
-        abort(403, description="Access denied.")
+        return redirect(url_for('main.login'))
 
-    form = DeleteAccountForm()
-    if form.validate_on_submit():
-        try:
-            user_id_hash = hash_for_log(user.id)
-            db.session.delete(user)
-            db.session.commit()
-            session.clear()
-            flash("Your account has been deleted successfully.", "success")
-            current_app.logger.info(
-                f"Account deleted. User: {user_id_hash}, IP: {hash_for_log(user_ip)}"
-            )
-            return redirect(url_for('main.register'))  # or login page
-        except Exception:
-            db.session.rollback()
-            flash("An unexpected error occurred while deleting your account.", "error")
-            current_app.logger.error(
-                f"Failed to delete account. User: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}",
-                exc_info=True
-            )
-
-    else:
-        flash("Form submission invalid. Please try again.", "error")
-        current_app.logger.warning(
-            f"Delete account form validation failed. User: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}"
+    except Exception:
+        db.session.rollback()
+        flash("An error occurred while deleting the account.", "error")
+        current_app.logger.error(
+            f"Failed to delete account. User ID: {hash_for_log(user.id)}, IP: {hash_for_log(user_ip)}",
+            exc_info=True
         )
-
     return render_template('login.html', login_form=LoginForm())
 
