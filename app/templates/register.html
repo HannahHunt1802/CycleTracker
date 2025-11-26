@@ -5,34 +5,34 @@
 
 <section class="form-container" id="register-form-container">
     <form method="POST" novalidate>
-        {{ form.hidden_tag() }} <!-- includes csrf token automatically -->
+        {{ register_form.hidden_tag() }} <!-- includes csrf token automatically -->
 
-        <label for="name">{{ form.name.label }}</label>
-        {{ form.name(class="form-input", id="name", placeholder="First Name") }}
-        {% for error in form.name.errors %}
+        <label for="name">{{ register_form.name.label }}</label>
+        {{ register_form.name(class="form-input", id="name", placeholder="First Name") }}
+        {% for error in register_form.name.errors %}
             <span style="color: red;">{{ error }}</span>
         {% endfor %}
 
-        <label for="email">{{ form.email.label }}</label>
-        {{ form.email(class="form-input", id="email", placeholder="Email") }}
-        {% for error in form.email.errors %}
+        <label for="email">{{ register_form.email.label }}</label>
+        {{ register_form.email(class="form-input", id="email", placeholder="Email") }}
+        {% for error in register_form.email.errors %}
             <span style="color: red;">{{ error }}</span>
         {% endfor %}
 
-        <label for="password">{{ form.password.label }}</label>
-        {{ form.password(class="form-input", id="password", placeholder="Password") }}
-        {% for error in form.password.errors %}
+        <label for="password">{{ register_form.password.label }}</label>
+        {{ register_form.password(class="form-input", id="password", placeholder="Password") }}
+        {% for error in register_form.password.errors %}
             <span style="color: red;">{{ error }}</span>
         {% endfor %}
 
-        <label for="confirm_password">{{ form.confirm_password.label }}</label>
-        {{ form.confirm_password(class="form-input", id="confirm_password", placeholder="Confirm Password") }}
-        {% for error in form.confirm_password.errors %}
+        <label for="confirm_password">{{ register_form.confirm_password.label }}</label>
+        {{ register_form.confirm_password(class="form-input", id="confirm_password", placeholder="Confirm Password") }}
+        {% for error in register_form.confirm_password.errors %}
             <span style="color: red;">{{ error }}</span>
         {% endfor %}
 
         <section class="btn-container">
-          {{ form.submit(class="sign-in-btn") }}
+          {{ register_form.submit(class="sign-in-btn") }}
         </section>
     </form>
 </section>
