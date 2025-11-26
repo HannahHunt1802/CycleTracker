@@ -248,10 +248,10 @@ input:-webkit-autofill:active {
 /* ================================
    2. Tab Contents
 ====================================*/
-
 .tab-content {
     /*by default, tab contents are not displayed.*/
     display: none;
+    z-index:0;
 }
 .tab-content.active {
   display: block;
@@ -260,9 +260,6 @@ input:-webkit-autofill:active {
 /* ================================
    SETTINGS TAB (MY ACCOUNT)
 ====================================*/
-.tab-content{
-    z-index:0;
-}
 /* Full-width container inside the tab content */
 .open-tab-container {
     background-color: #D2C2AB;
@@ -316,7 +313,6 @@ input:-webkit-autofill:active {
     margin-top: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
-    align-items: center;
     padding: 12px 0;
 }
 
