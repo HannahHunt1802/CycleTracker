@@ -24,6 +24,50 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s; /* prevents flash */
 }
 
+/*flash messages*/
+.flash-messages {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index:2;
+}
+
+.flash {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    text-align: center;
+    opacity: 1;
+    animation: fadeOut 3s forwards; /* total duration: 5s */
+}
+
+/* specific styles for categories */
+.flash.error {
+    background-color: #F8D7DA;  /* light red */
+    color: #842029;             /* dark red */
+    border: 1px solid #F5C2C7;
+}
+
+.flash.success {
+    background-color: #D1E7DD;  /* light green */
+    color: #0F5132;             /* dark green */
+    border: 1px solid #BADBCC;
+}
+
+.flash.info {
+    background-color: #CCE5FF;  /* light blue */
+    color: #084298;             /* dark blue */
+    border: 1px solid #B6D4FE;
+}
+
+/* Fade-out animation: stays visible for 4s, then fades out */
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
 /* ================================
    2. Sign In Page
 ====================================*/
