@@ -58,3 +58,7 @@ class PeriodLog(db.Model):
     period_end = db.Column(db.Date, nullable=True)
 
     created_at = db.Column(DateTime(timezone=True), server_default=func.now())
+
+    #
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'period_start', 'period_end', name='unique_period_per_user'),)
