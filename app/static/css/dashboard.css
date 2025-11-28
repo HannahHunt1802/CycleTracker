@@ -544,3 +544,6 @@ input:-webkit-autofill:active {
 #day-info-panel.visible {
     display: block;
 }
+.hidden {
+    display: none !important;
+}
