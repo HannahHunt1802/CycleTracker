@@ -334,3 +334,63 @@ def delete_account():
         )
     return render_template('login.html', login_form=LoginForm())
 
+#api endpoints for creating and editing period
+@main.route('/api/periods', methods=['POST'])
+@login_required
+def api_create_period():
+    user=get_current_user()
+    data=request.json
+
+    try:
+        start = data.get("period_start")
+        end = data.get("period_end") or start
+
+        period = PeriodLog(
+            user_id=user.id,
+            period_start=start,
+            period_end=end
+        )
+        db.session.add(period)
+        db.session.commit()
+        flash("Period created successfully.", "success")
+        current_app.logger.info(f"Period created. User: {hash_for_log(user.id)}")
+
+        return {"success": True, "id": period.id}, 201
+    except Exception as e:
+        db.session.rollback()
+        return {"success": False, "error": str(e)}, 500
+
+
+@main.route("/api/periods/<int:period_id>", methods=["PUT"])
+@login_required
+def api_update_period(period_id):
+    user = get_current_user()
+    data = request.get_json()
+    period = PeriodLog.query.filter_by(id=period_id, user_id=user.id).first()
+
+    if not period:
+        return {"success": False, "error": "Not found"}, 404
+
+    try:
+        period.period_start = data.get("period_start", period.period_start)
+        period.period_end = data.get("period_end", period.period_end)
+        db.session.commit()
+        return {"success": True}
+    except Exception as e:
+        db.session.rollback()
+        return {"success": False, "error": str(e)}, 500
+
+@main.route("/api/periods/<int:pid>", methods=["DELETE"])
+@login_required
+def api_delete_period(period_id):
+    user = get_current_user()
+    period = PeriodLog.query.filter_by(id=period_id, user_id=user.id).first()
+    if not period:
+        return {"success": False, "error": "Not found"}, 404
+    try:
+        db.session.delete(period)
+        db.session.commit()
+        return {"success": True}
+    except Exception as e:
+        db.session.rollback()
+        return {"success": False, "error": str(e)}, 500
