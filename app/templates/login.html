@@ -17,6 +17,9 @@
     {% endwith %}
 
 <section class="form-container" id="login-form-container">
+    <h5>Future Developments:</h5>
+        <ul>Email confirmation</ul>
+        <ul>Log in with Google option</ul>
     <form method="POST" action="{{ url_for('main.login') }}"novalidate>
         {{ login_form.hidden_tag() }}
         <label for="email">{{ login_form.email.label }}</label>
